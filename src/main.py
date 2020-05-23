@@ -1,7 +1,7 @@
 import sys
 from blessed import Terminal
-from pygit2 import clone_repository
-from uuid4 import uuid4
+from pygit2 import clone_repository, GIT_SORT_REVERSE
+from uuid import uuid4
 
 from input import Input
 from graphics import Graphics
@@ -15,9 +15,14 @@ class Main():
         self.graphics = Graphics(self.term)
 
         self.filler = ['~'] * (self.term.height - 1)
-        self.messages = []
+        self.messages = self.filler
         self.repo = None
         self.gitirc_file = None
+
+    def load_messages(self):
+        if self.repo:
+            self.messages = [commit.message for commit in self.repo.walk(self.repo.head.target, GIT_SORT_REVERSE)]
+            import pdb; pdb.set_trace()
 
     def register_server(self, trailing_words: List[str]):
         repo_name = trailing_words[0]
@@ -31,13 +36,15 @@ class Main():
         with open(filename, "w"):
             self.gitirc_file = filename
 
+        self.load_messages()
+
 
     def on_quit(self, trailing_words: List[str]):
         # TODO: Post quit message
         sys.exit(0)
 
     def on_input(self, buffer):
-        self.graphics.redraw(self.filler, buffer)
+        self.graphics.redraw(self.messages, buffer)
 
     def start(self):
         with self.term.fullscreen(), self.term.cbreak():
