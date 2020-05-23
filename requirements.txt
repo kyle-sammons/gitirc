@@ -1,0 +1,2 @@
+blessed
+pygit2
