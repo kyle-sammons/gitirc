@@ -29,7 +29,7 @@ class Input():
         for handler in self.enter_handlers:
             handler(buffer)
 
-    def start(self):
+    def start_input_loop(self):
         buffer = ""
         while True:
             key = self.term.inkey()
