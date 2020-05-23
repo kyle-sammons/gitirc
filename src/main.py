@@ -21,8 +21,12 @@ class Main():
 
     def load_messages(self):
         if self.repo:
-            self.messages = [commit.message for commit in self.repo.walk(self.repo.head.target, GIT_SORT_REVERSE)]
-            import pdb; pdb.set_trace()
+            loaded_messages = []
+            for commit in self.repo.walk(self.repo.head.target, GIT_SORT_REVERSE):
+                message = commit.message.strip()
+                loaded_messages.append(f"{commit.committer.raw_name.decode()}: {message}")
+
+            self.messages = (['~'] * ((self.term.height - 1) - len(loaded_messages))) + loaded_messages
 
     def register_server(self, trailing_words: List[str]):
         repo_name = trailing_words[0]
@@ -37,6 +41,7 @@ class Main():
             self.gitirc_file = filename
 
         self.load_messages()
+        self.graphics.redraw(self.messages, "")
 
 
     def on_quit(self, trailing_words: List[str]):
