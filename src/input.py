@@ -1,3 +1,4 @@
+import time
 from blessed import Terminal
 from typing import Dict, List, Callable
 
@@ -29,9 +30,14 @@ class Input():
         for handler in self.enter_handlers:
             handler(buffer)
 
-    def start_input_loop(self):
+    def start_input_loop(self, temp_callback_test):
         buffer = ""
+        start = time.time()
         while True:
+            if (time.time() - start) >= 3:
+                temp_callback_test()
+                start = time.time()
+
             key = self.term.inkey()
             if key.name == "KEY_BACKSPACE" or key.name == "KEY_DELETE":
                 buffer = buffer[:-1]
